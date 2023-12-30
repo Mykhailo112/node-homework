@@ -5,11 +5,12 @@
     "email": "nulla.ante@vestibul.co.uk",
     "phone": "(992) 914-3792"
   },
-  { "id": "qdggE76Jtbfd9eWJHrssH",
+  {
+    "id": "qdggE76Jtbfd9eWJHrssH",
     "name": "Chaim Lewis",
     "email": "dui.in@egetlacus.ca",
-    "phone": "(294) 840-6685" 
-    },
+    "phone": "(294) 840-6685"
+  },
   {
     "id": "drsAJ4SHPYqZeG-83QTVW",
     "name": "Kennedy Lane",
@@ -57,5 +58,11 @@
     "name": "Alec Howard",
     "email": "Donec.elementum@scelerisquescelerisquedui.net",
     "phone": "(748) 206-2688"
+  },
+  {
+    "id": "O0OMHE2gsYf5yhEptsHtd",
+    "name": "Alec Howards",
+    "email": "Donec.elementum@squedui.net",
+    "phone": "(748) 888-7777"
   }
 ]

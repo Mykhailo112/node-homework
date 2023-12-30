@@ -1,8 +1,8 @@
 import { HttpError } from "../helpers/index.js";
 
 const isEmptyBody = (req, res, next) => {
-  const { length } = Object.keys(req.body);
-  if (!length) {
+  const keys = Object.keys(req.body);
+  if (!keys.length) {
     return next(HttpError(400, "Body must have fields"));
   }
   next();
