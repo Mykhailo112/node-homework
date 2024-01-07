@@ -2,18 +2,45 @@ import express from "express";
 
 import contactsController from "../../controlers/contacts-controller.js";
 
-import { isEmptyBody } from "../../middlewares/index.js";
+import { isEmptyBody, isValidId } from "../../middlewares/index.js";
+
+import { validateBody } from "../../decorators/index.js";
+
+import {
+  contactAddSchema,
+  contactUpdateSchema,
+  contactUpdateFavoriteSchema,
+} from "../../models/contacts/index.js";
 
 const contactsRouter = express.Router();
 
 contactsRouter.get("/", contactsController.getList);
 
-contactsRouter.get("/:id", contactsController.getById);
+contactsRouter.get("/:id", isValidId, contactsController.getById);
 
-contactsRouter.post("/", isEmptyBody, contactsController.add);
+contactsRouter.post(
+  "/",
+  isEmptyBody,
+  validateBody(contactAddSchema),
+  contactsController.add
+);
 
-contactsRouter.delete("/:id", contactsController.deleteById);
+contactsRouter.put(
+  "/:id",
+  isValidId,
+  isEmptyBody,
+  validateBody(contactUpdateSchema),
+  contactsController.updateById
+);
 
-contactsRouter.put("/:id", isEmptyBody, contactsController.updateById);
+contactsRouter.patch(
+  "/:id/favorite",
+  isValidId,
+  isEmptyBody,
+  validateBody(contactUpdateFavoriteSchema),
+  contactsController.updateById
+);
+
+contactsRouter.delete("/:id", isValidId, contactsController.deleteById);
 
 export default contactsRouter;
