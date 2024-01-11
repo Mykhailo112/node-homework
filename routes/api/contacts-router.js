@@ -10,7 +10,7 @@ import {
   contactAddSchema,
   contactUpdateSchema,
   contactUpdateFavoriteSchema,
-} from "../../models/contacts/index.js";
+} from "../../models/contacts.js";
 
 const contactsRouter = express.Router();
 
