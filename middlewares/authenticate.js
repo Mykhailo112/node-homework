@@ -1,16 +1,13 @@
 import jwt from "jsonwebtoken";
 import { HttpError } from "../helpers/index.js";
-import User from "../models/User.js";
+import User from "../models/user.js";
 
 const { JWT_SECRET } = process.env;
 
 const authenticate = async (req, res, next) => {
-  const { authenticate } = req.headers;
-  if (!authenticate) {
-    return next(HttpError(401, "Authorization not define"));
-  }
+  const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
-  if (bearer !== "Bearer") {
+  if (bearer !== "Bearer" || !token) {
     return next(HttpError(401));
   }
   try {

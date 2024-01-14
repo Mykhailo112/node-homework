@@ -2,23 +2,23 @@ import express from "express";
 import authController from "../../controlers/auth-controller.js";
 import { isEmptyBody, authenticate } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
-import { userSignupSchema, userSigninSchema } from "../../models/User.js";
+import { userRegisterSchema, userLoginSchema } from "../../models/user.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
-  "/signup",
+  "/register",
   isEmptyBody,
-  validateBody(userSignupSchema),
-  authController.signup
+  validateBody(userRegisterSchema),
+  authController.register
 );
 authRouter.post(
-  "/signin",
+  "/login",
   isEmptyBody,
-  validateBody(userSigninSchema),
-  authController.signin
+  validateBody(userLoginSchema),
+  authController.login
 );
 authRouter.get("/current", authenticate, authController.getCurrent);
-authRouter.post("/signout", authenticate, authController.signout);
+authRouter.post("/logout", authenticate, authController.logout);
 
 export default authRouter;
