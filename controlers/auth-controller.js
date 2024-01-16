@@ -1,10 +1,15 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import fs from "fs/promises";
+import path from "path";
+import gravatar from "gravatar";
 import User from "../models/user.js";
 import { HttpError } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
+import Jimp from "jimp";
 
 const { JWT_SECRET } = process.env;
+const avatarDir = path.join("public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -14,7 +19,12 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const avatarURL = gravatar.url(email);
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
 
   res.status(201).json({
     user: {
@@ -79,10 +89,35 @@ const updateSubscription = async (req, res) => {
   res.status(201).json({ email, subscription });
 };
 
+const updAvatar = async (req, res) => {
+  const { _id } = req.user;
+  if (!req.file) {
+    throw HttpError(400, "missing field avatar");
+  }
+
+  const { path: tempUpload, originalName } = req.file;
+  await Jimp.read(tempUpload).then((img) =>
+    img.resize(250, 250).write(`${tempUpload}`)
+  );
+
+  const fileName = `${_id}_${originalName}`;
+  const resultUpload = path.join(avatarDir, fileName);
+  await fs.rename(tempUpload, resultUpload);
+
+  const avatarURL = path.join("avatars", fileName);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+  if (!avatarURL) {
+    throw HttpError(404, "Not found");
+  }
+
+  res.json({ avatarURL });
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updAvatar: ctrlWrapper(updAvatar),
 };
