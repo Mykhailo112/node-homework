@@ -7,9 +7,7 @@ const destination = path.resolve("temp");
 const storage = multer.diskStorage({
   destination,
   filename: (req, file, callback) => {
-    const uniquePreffix = `${Date.now()}_${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniquePreffix}_${file.originalname}`;
-    callback(null, filename);
+    callback(null, file.originalname);
   },
 });
 
@@ -27,7 +25,6 @@ const fileFilter = (req, file, callback) => {
 const upload = multer({
   storage,
   limits,
-  fileFilter,
 });
 
 export default upload;
