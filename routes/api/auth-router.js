@@ -1,6 +1,6 @@
 import express from "express";
 import authController from "../../controlers/auth-controller.js";
-import { isEmptyBody, authenticate } from "../../middlewares/index.js";
+import { isEmptyBody, authenticate, upload } from "../../middlewares/index.js";
 import { validateBody } from "../../decorators/index.js";
 import {
   userRegisterSchema,
@@ -29,6 +29,12 @@ authRouter.patch(
   authenticate,
   validateBody(updateSubscriptionSchema),
   authController.updateSubscription
+);
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  authController.updAvatar
 );
 
 export default authRouter;
