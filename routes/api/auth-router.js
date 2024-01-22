@@ -37,7 +37,7 @@ authRouter.patch(
   upload.single("avatar"),
   authController.updAvatar
 );
-authRouter.get("/verify/:verificationToken", authController.verifyEmail);
+authRouter.get("/verify/:verificationToken", authController.verify);
 authRouter.post(
   "/verify",
   validateBody(emailSchema),

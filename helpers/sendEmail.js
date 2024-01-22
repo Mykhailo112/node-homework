@@ -1,15 +1,23 @@
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 import "dotenv/config";
 
 const { SENDGRID_API_KEY, CORPORATE_EMAIL } = process.env;
 
-sgMail.setApiKey(SENDGRID_API_KEY);
+const nodemailerConfig = {
+  host: "smtp.ukr.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: CORPORATE_EMAIL,
+    pass: SENDGRID_API_KEY,
+  },
+};
 
-const sendEmail = async (data) => {
+const tranport = nodemailer.createTransport(nodemailerConfig);
+
+const sendEmail = (data) => {
   const email = { ...data, from: CORPORATE_EMAIL };
-  await sgMail.send(email);
-
-  return true;
+  return tranport.sendMail(email);
 };
 
 export default sendEmail;

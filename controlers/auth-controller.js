@@ -10,9 +10,8 @@ import { ctrlWrapper } from "../decorators/index.js";
 import Jimp from "jimp";
 import "dotenv/config";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, BASE_URL } = process.env;
 const avatarDir = path.join("public", "avatars");
-const { BASE_URL } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -23,18 +22,18 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
-  const verificationToken = nanoid();
+  const verificationCode = nanoid();
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
-    verificationToken,
+    verificationCode,
   });
 
   const verifyEmail = {
     to: email,
     subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verufy email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationCode}">Click verufy email</a>`,
   };
 
   await sendEmail(verifyEmail);
@@ -135,16 +134,16 @@ const resendVerifyEmail = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw HttpError(401, "Email not found");
+    throw HttpError(404, "Email not found");
   }
-  if (!user.verify) {
+  if (user.verify) {
     throw HttpError(400, "verification has already been passed");
   }
 
   const verifyEmail = {
     to: email,
     subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verufy email</a>`,
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationCode}">Click verify email</a>`,
   };
 
   await sendEmail(verifyEmail);
@@ -152,17 +151,17 @@ const resendVerifyEmail = async (req, res) => {
   res.json({ message: "Verification email sent" });
 };
 
-const verifyEmail = async (req, res) => {
-  const { verificationToken } = req.params;
-  const user = User.findOne({ verificationToken });
+const verify = async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await User.findOne({ verificationCode });
 
   if (!user) {
-    throw HttpError(404, "User not found");
+    throw HttpError(400, "Email not found or already verify");
   }
 
   await User.findByIdAndUpdate(user._id, {
     verify: true,
-    verificationToken: "",
+    verificationCode: "",
   });
 
   res.json({ message: "Verification successful" });
@@ -176,5 +175,5 @@ export default {
   updateSubscription: ctrlWrapper(updateSubscription),
   updAvatar: ctrlWrapper(updAvatar),
   resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
-  verifyEmail: ctrlWrapper(verifyEmail),
+  verify: ctrlWrapper(verify),
 };
